@@ -156,7 +156,7 @@ func (c *Ctx) Next() error {
 func (c *Ctx) verify() error {
 	// 验证 body size
 	if c.app.config.BodyLimit != -1 && c.Request.ContentLength > c.app.config.BodyLimit {
-		return NewNFError(413, "Content Too Large")
+		return NewError(413, "Content Too Large")
 	}
 
 	return nil
@@ -276,7 +276,7 @@ func (c *Ctx) BodyParser(out interface{}) error {
 	if strings.HasSuffix(ctype, "json") {
 		// Check if body has already been read
 		if c.Request.Body == nil || c.Request.Body == http.NoBody {
-			return NewNFError(400, "Request body is empty")
+			return NewError(400, "Request body is empty")
 		}
 
 		// Read body once and cache it
@@ -292,7 +292,7 @@ func (c *Ctx) BodyParser(out interface{}) error {
 		// Use json.Decoder for better performance with large bodies
 		decoder := json.NewDecoder(bytes.NewReader(bs))
 		if err := decoder.Decode(out); err != nil {
-			return NewNFError(400, "Invalid JSON: "+err.Error())
+			return NewError(400, "Invalid JSON: "+err.Error())
 		}
 		
 		return nil
@@ -300,19 +300,19 @@ func (c *Ctx) BodyParser(out interface{}) error {
 
 	if strings.HasPrefix(ctype, MIMEApplicationForm) {
 		if err = c.Request.ParseForm(); err != nil {
-			return NewNFError(400, err.Error())
+			return NewError(400, err.Error())
 		}
 		return parseToStruct("form", out, c.Request.Form)
 	}
 
 	if strings.HasPrefix(ctype, MIMEMultipartForm) {
 		if err = c.Request.ParseMultipartForm(c.app.config.BodyLimit); err != nil {
-			return NewNFError(400, err.Error())
+			return NewError(400, err.Error())
 		}
 		return parseToStruct("form", out, c.Request.PostForm)
 	}
 
-	return NewNFError(422, "Unprocessable Content")
+	return NewError(422, "Unprocessable Content")
 }
 
 func (c *Ctx) QueryParser(out interface{}) error {

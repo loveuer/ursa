@@ -51,7 +51,7 @@ go get github.com/loveuer/ursa
       )
 
       if err = c.QueryParser(&req); err != nil {
-          return ursa.NewNFError(400, err.Error())
+          return ursa.NewError(400, err.Error())
       }
 
       return c.JSON(ursa.Map{"query": req})
@@ -74,12 +74,12 @@ go get github.com/loveuer/ursa
       )
 
       if err = c.BodyParser(&req); err != nil {
-          return ursa.NewNFError(400, err.Error())
+          return ursa.NewError(400, err.Error())
       }
 
       // can parse body multiple times
       if err = c.BodyParser(&reqMap); err != nil {
-          return ursa.NewNFError(400, err.Error())
+          return ursa.NewError(400, err.Error())
       }
 
       return c.JSON(ursa.Map{"struct": req, "map": reqMap})
